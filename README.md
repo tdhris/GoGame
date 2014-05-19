@@ -2,7 +2,7 @@ GoGame
 ======
 ## What is Go?
 
-Go is one of the oldest board games in the world. It's played by two people placing black and white stones on the empty intersections of the board (called goban in Japanese). The goal of the game is to conquer a larger total area of the board than your opponent. The rules of Go are simple, but it resists all attempts to program computers to play Go. Even the best programs, the results of many years development, are still easily beaten by experienced players. It has been described as being like four Chess games going on together on the same board.
+Go is one of the oldest board games in the world. It's played by two people placing black and white stones on the empty intersections of the board (called goban in Japanese). The goal of the game is to conquer a larger total area of the board than your opponent.
 
 ## Rules of Go
 
