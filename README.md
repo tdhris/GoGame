@@ -21,16 +21,11 @@ Also, to allow players of different skills to compete fairly, handicaps and komi
 
 ## Game Functionality
 
-* The game will enforce the rules of Go, count territory (according to the Japanese rules) and announce the winner at the end of the game. It has to:
-1. Stop when a player resigns or both of the players pass in succession
-2. Recognize when a stone/group of stones is captured and remove it from the board
-3. Recognize seki points and territory points
-4. Keep score
-
-* Allow the player to change game options such as komi (set at 6.5 by default) and handicap (0 by default)
+* The game will enforce the rules of Go, count territory (according to the Japanese rules) and announce the winner at the end of the game. It has to: stop when a player resigns or both of the players pass in succession, recognize when a stone/group of stones is captured and remove it from the board, recognize seki points and territory points, keep score;
+* The player will be able to change game options such as komi (set at 6.5 by default) and handicap (0 by default)
 * GUI
 * Sound (when a player places a stone on the board)
 
 ## Milestone 2
 
-Most of the game logic.
+I'd like to have written most of the game logic by then.
