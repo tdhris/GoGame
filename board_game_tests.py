@@ -55,6 +55,17 @@ class BoardGameBasicFunctionalityTests(unittest.TestCase):
         self.game.make_move(p)
         self.assertEqual(self.players[0], self.game.current_player)
 
+    def test_game_changes_turn_when_players_resign(self):
+        self.assertEqual(self.players[0], self.game.current_player)
+        self.game.resign()
+        self.assertEqual(self.players[1], self.game.current_player)
+
+    def test_game_is_won_when_one_of_two_players_resigns(self):
+        self.assertEqual(self.players[0], self.game.current_player)
+        self.game.resign()
+        self.assertEqual(self.game.winner, self.game.current_player)
+        self.assertFalse(self.game.running)
+
     def tearDown(self):
         self.game.board.clear_board()
 
