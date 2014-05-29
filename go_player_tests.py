@@ -13,31 +13,31 @@ class GoPlayerBoardPlayerTests(unittest.TestCase):
 
     def test_player_keeps_track_of_his_own_moves(self):
         p1 = Position(0, 0)
-        self.player.make_move(p1)
+        self.player.put_stone(p1)
         p2 = Position(3, 4)
-        self.player.make_move(p2)
+        self.player.put_stone(p2)
         p3 = Position(5, 7)
-        self.player.make_move(p3)
-        self.assertEqual([p1, p2, p3], self.player.moves)
+        self.player.put_stone(p3)
+        self.assertEqual([p1, p2, p3], self.player.stones)
 
     def test_player_removes_move_from_record_when_move_is_in_record(self):
         p1 = Position(0, 0)
-        self.player.make_move(p1)
+        self.player.put_stone(p1)
         p2 = Position(3, 4)
-        self.player.make_move(p2)
+        self.player.put_stone(p2)
         p3 = Position(5, 7)
-        self.player.make_move(p3)
-        self.assertEqual([p1, p2, p3], self.player.moves)
+        self.player.put_stone(p3)
+        self.assertEqual([p1, p2, p3], self.player.stones)
         self.player.remove_stone(p2)
-        self.assertEqual([p1, p3], self.player.moves)
+        self.assertEqual([p1, p3], self.player.stones)
 
     def test_player_DOES_NOT_remove_move_from_record_when_move_is_NOT_in_record(self):
         p1 = Position(0, 0)
-        self.player.make_move(p1)
+        self.player.put_stone(p1)
         p2 = Position(3, 4)
-        self.assertEqual([p1], self.player.moves)
+        self.assertEqual([p1], self.player.stones)
         self.player.remove_stone(p2)
-        self.assertEqual([p1], self.player.moves)
+        self.assertEqual([p1], self.player.stones)
 
 
 class GoPlayerTests(unittest.TestCase):
