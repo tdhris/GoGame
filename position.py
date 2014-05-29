@@ -3,20 +3,16 @@ class Position:
         self._x = x
         self._y = y
 
+    def __repr__(self):
+        return "(" + str(self.x) + ", " + str(self.y) + ")"
+
     @property
     def x(self):
         return self._x
 
-    @x.setter
-    def x(self, value):
-        pass
-
     @property
     def y(self):
         return self._y
-    @y.setter
-    def y(self, value):
-        pass
 
     def change_position(self, new_x, new_y):
         self._x = new_x

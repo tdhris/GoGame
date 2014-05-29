@@ -28,12 +28,12 @@ class GoGame(BoardGame):
 
     def make_move(self, move):
         super(GoGame, self).make_move(move)
-        self.check_game_state()
+        self._check_game_state()
 
-    def check_game_state(self):
-        self.capture_stones()
+    def _check_game_state(self):
+        self._capture_stones()
 
-    def capture_stones(self):
+    def _capture_stones(self):
         for stone in self.current_player.stones:
             if not self._has_at_least_one_liberty(stone):
                 self._remove_stone(stone)
@@ -58,8 +58,11 @@ class GoGame(BoardGame):
             right = Position(stone.x, stone.y + 1)
             if self.goban.is_empty(right):
                 return True
-
         return False
+
+    def _remove_stone(self, stone):
+        self.goban.remove(stone)
+        self.current_player.remove_move(stone)
 
     def _check_all_stones_have_liberties(self):
         pass

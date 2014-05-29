@@ -1,5 +1,6 @@
 from board_game_player import BoardGamePlayer
 
+
 class GoPlayer(BoardGamePlayer):
     def __init__(self, symbol):
         super(GoPlayer, self).__init__(symbol)
