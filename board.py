@@ -1,43 +1,3 @@
-"""
-Board Class
-
-Instances are square matrices of given size.
-When creating a subclass of Board, Board.__init__ method should always be called with the size parameter.
-
-Attributes:
-* size
-        Returns the size of the board.
-
-Functionality:
-* is_iniside_board(self, position)
-        Returns True if position is valid position inside the board
-* at(self, position)
-        Used to get the element at a particular position on the board.
-
-* place(self, position)
-        Used to set an element at a particular position on the board.
-
-* remove(self, position)
-        Used to remove element from a particular position on the board.
-
-* is_empty(self, position)
-        Returns True is there's no element at a particular position on the board.
-
-* is_board_full(self)
-        Returns True if all fields are taken.
-
-* is_board_empty(self)
-        Returns True if no fields are taken.
-
-* clear_board(self)
-        Removes all elements from the board.
-
-* count_taken_fields
-        Counts all fields that are not empty
-
-"""
-
-
 class Board:
     EMPTY_FIELD = None
     DEFAULT_BOARD_SIZE = 3
@@ -93,12 +53,11 @@ class Board:
         self._board = self._generate_empty_board()
 
     def is_iniside_board(self, position):
-        return self._point_inside_board(position.x) and self._point_inside_board(position.y)
+        return self._point_inside_board(position.x) and\
+            self._point_inside_board(position.y)
 
     def _generate_empty_board(self):
         return [[self.EMPTY_FIELD] * self.size for row in range(self.size)]
 
-
     def _point_inside_board(self, point):
         return point >= 0 and point < self.size
-    

@@ -1,11 +1,14 @@
 from board_game import BoardGame
 from position import Position
+from board_game_player import BoardGamePlayer
 import unittest
 
 
 class BoardGameBasicFunctionalityTests(unittest.TestCase):
     def setUp(self):
-        self.players = ["X", "O"]
+        x = BoardGamePlayer("X")
+        o = BoardGamePlayer("O")
+        self.players = [x, o]
         self.board_size = len(self.players)
         self.game = BoardGame(self.players, self.board_size)
 
@@ -42,7 +45,10 @@ class BoardGameBasicFunctionalityTests(unittest.TestCase):
         self.assertEqual(self.players[0], self.game.current_player)
 
     def test_game_changes_turns_automatically_when_players_make_valid_moves(self):
-        players = ["X", "Y", "O", "Z"]
+        x, y, o, z = BoardGamePlayer("X"), BoardGamePlayer("Y"),\
+            BoardGamePlayer("O"), BoardGamePlayer("Z")
+
+        players = [x, y, o, z]
         g = BoardGame(players, len(players))
         for i in range(len(players)):
             self.assertEqual(players[i], g.current_player)

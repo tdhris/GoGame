@@ -3,31 +3,6 @@ from itertools import cycle
 from copy import copy
 
 
-"""
-BoardGame Class
-
-When creating instances of BoardGame(), a list of players should always be provided as a parameter.
-When creating a subclass of BoardGame, BoardGame.__init__ method should always be called with the 'players' parameter.
-
-Attributes:
-* board
-        An object of the Board class
-
-* running
-        Returns true if the game is still in progress.
-
-* current_player
-        Returns the player whose turn it is in the game.
-
-* player_count
-        Returns the number of players in the game.
-
-Functionality:
-
-
-"""
-
-
 class BoardGame:
     def __init__(self, players, size=Board.DEFAULT_BOARD_SIZE):
         self._board = Board(size)
@@ -36,7 +11,7 @@ class BoardGame:
         self._current_player = self._get_next_player()
         self._running = True
         self._has_winner = False
-    
+
     @property
     def board(self):
         return self._board
@@ -55,7 +30,7 @@ class BoardGame:
 
     @property
     def players(self):
-        return self._players    
+        return self._players
 
     @property
     def has_winner(self):
@@ -63,7 +38,8 @@ class BoardGame:
 
     def make_move(self, move):
         if self.running and self.is_move_valid(move):
-            self.board.place(move, self.current_player)
+            self.board.place(move, self.current_player.symbol)
+            self.current_player.make_move(move)
             self._check_board_full()
             self._change_turn()
 
@@ -101,4 +77,3 @@ class BoardGame:
     def _next_player(self):
         for player in cycle(self._players):
             yield player
-    
