@@ -14,5 +14,10 @@ class GoPlayer(BoardGamePlayer):
     def captured_stones(self):
         return self._captured_stones
 
-    def capture_stone(self):
-        self._captured_stones += 1
+    def capture_stones(self, *stones):
+        for stone in stones:
+            self._captured_stones += 1
+
+    def last_move(self):
+        last = len(self.stones) - 1
+        return self.stones[last]

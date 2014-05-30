@@ -47,13 +47,17 @@ class GoPlayerTests(unittest.TestCase):
 
     def test_player_captures_a_stone(self):
         self.assertEqual(0, self.player.captured_stones)
-        self.player.capture_stone()
+        stone = Position(1, 1)
+        self.player.capture_stones(stone)
         self.assertEqual(1, self.player.captured_stones)
 
     def test_player_captures_multiple_stones(self):
+        stones = []
         n = 10
         for i in range(n):
-            self.player.capture_stone()
+            stone = Position(i, i)
+            stones.append(stone)
+        self.player.capture_stones(*stones)
         self.assertEqual(n, self.player.captured_stones)
 
 

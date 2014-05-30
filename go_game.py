@@ -24,45 +24,108 @@ class GoGame(BoardGame):
 
     @property
     def opponent(self):
-        return self._get_next_player()
+        if self.current_player.symbol == self.BLACK:
+            return self.players[1]
+        else:
+            return self.players[0]
 
     def make_move(self, move):
-        super(GoGame, self).make_move(move)
-        self._check_game_state()
+        if self.running and self.is_move_valid(move):
+            self.board.place(move, self.current_player.symbol)
+            self.current_player.make_move(move)
+            # self._check_game_state()
+            self._change_turn()
+
+    def _change_turn(self):
+        self._current_player = self.opponent
 
     def _check_game_state(self):
+        self._check_board_full()
         self._capture_stones()
 
     def _capture_stones(self):
-        for stone in self.current_player.stones:
-            if not self._has_at_least_one_liberty(stone):
-                self._remove_stone(stone)
+        new_stone = self.current_player.last_move()
+        groups = self._get_adjacent_opponent_groups(new_stone)
+        for group in groups:
+            if self._group_surrounded(group):
+                self._remove_group(group)
+                self.current_player.capture_stones(*group)
 
-    def _has_at_least_one_liberty(self, stone):
-        if stone.x > 0:
-            upper = Position(stone.x - 1, stone.y)
-            if self.goban.is_empty(upper):
-                return True
-
-        if stone.x < self.goban.size:
-            lower = Position(stone.x + 1, stone.y)
-            if self.goban.is_empty(lower):
-                return True
-
-        if stone.y > 0:
-            left = Position(stone.x, stone.y - 1)
-            if self.goban.is_empty(left):
-                return True
-
-        if stone.y < self.goban.size:
-            right = Position(stone.x, stone.y + 1)
-            if self.goban.is_empty(right):
-                return True
-        return False
+    def _remove_group(self, group):
+        for stone in group:
+            self._remove_stone(stone)
 
     def _remove_stone(self, stone):
         self.goban.remove(stone)
         self.current_player.remove_move(stone)
 
-    def _check_all_stones_have_liberties(self):
-        pass
+    def _get_adjacent_opponent_groups(self, stone):
+        groups = []
+        oppositecolor_neighbors = self._get_oppositecolor_neighbors(stone)
+        for neighbor in oppositecolor_neighbors:
+            if self.goban.at(neighbor) == self.opponent.symbol:
+                group = self._get_group(neighbor)
+                if group not in groups:
+                    groups.append(group)
+        return groups
+
+    def _get_group(self, origin):
+        group = set([origin])
+        neighbors_to_add = self._get_samecolor_neighbors(origin)
+
+        while len(neighbors_to_add) > 0:
+            neighbor = neighbors_to_add.pop()
+            group.add(neighbor)
+            adjacent_to_neighbor = self._get_samecolor_neighbors(neighbor)
+            for adjacent in adjacent_to_neighbor:
+                if adjacent not in neighbors_to_add and adjacent not in group:
+                    neighbors_to_add.add(adjacent)
+        return group
+
+    def _get_oppositecolor_neighbors(self, stone):
+        oppositecolor_neighbors = set()
+        all_neighbors = self._get_neighbors(stone)
+        for neighbor in all_neighbors:
+            if not self.goban.is_empty(neighbor) and self.goban.at(neighbor) != self.goban.at(stone):
+                oppositecolor_neighbors.add(neighbor)
+        return oppositecolor_neighbors
+
+    def _get_samecolor_neighbors(self, stone):
+        samecolor_neighbors = set()
+        all_neighbors = self._get_neighbors(stone)
+        for neighbor in all_neighbors:
+            if not self.goban.is_empty(neighbor) and self.goban.at(neighbor) == self.goban.at(stone):
+                samecolor_neighbors.add(neighbor)
+        return samecolor_neighbors
+
+    def _group_surrounded(self, group):
+        for stone in group:
+            if self._has_at_least_one_liberty(stone):
+                return False
+        return True
+
+    def _has_at_least_one_liberty(self, stone):
+        neighbors = self._get_neighbors(stone)
+        for neighbor in neighbors:
+            if self.goban.is_empty(neighbor):
+                return True
+        return False
+
+    def _get_neighbors(self, stone):
+        neighbors = set()
+        if stone.x > 0:
+            upper = Position(stone.x - 1, stone.y)
+            neighbors.add(upper)
+
+        if stone.x < self.goban.size:
+            lower = Position(stone.x + 1, stone.y)
+            neighbors.add(lower)
+
+        if stone.y > 0:
+            left = Position(stone.x, stone.y - 1)
+            neighbors.add(left)
+
+        if stone.y < self.goban.size:
+            right = Position(stone.x, stone.y + 1)
+            neighbors.add(right)
+        return neighbors

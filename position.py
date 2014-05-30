@@ -6,6 +6,12 @@ class Position:
     def __repr__(self):
         return "(" + str(self.x) + ", " + str(self.y) + ")"
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __hash__(self):
+        return hash(self.__repr__())
+
     @property
     def x(self):
         return self._x

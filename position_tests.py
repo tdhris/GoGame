@@ -13,16 +13,25 @@ class PositionBasicTests(unittest.TestCase):
         self.assertEqual(-10, point.x)
         self.assertEqual(-10, point.y)
 
-    def test_you_cannot_change_coordinates_manually(self):
-        point = Position()
-        point.x = 10
-        self.assertEqual(0, point.x)
-
     def test_you_can_change_coordinates_from_the_change_position_method(self):
         point = Position()
         point.change_position(100, 100)
         self.assertEqual(100, point.x)
         self.assertEqual(100, point.y)
+
+    def test_equality(self):
+        point_a = Position(0, 0)
+        point_b = Position(0, 0)
+        self.assertEqual(point_b, point_a)
+
+    def test_unequality(self):
+        point_a = Position(0, 0)
+        point_b = Position(0, 1)
+        self.assertNotEqual(point_b, point_a)
+
+    def test_representation(self):
+        point_a = Position(13, 13)
+        self.assertEqual("(13, 13)", str(point_a))
 
 
 if __name__ == '__main__':
