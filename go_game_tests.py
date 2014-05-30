@@ -48,10 +48,16 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.game.make_move(white_move1)
         self.assertEqual({white_move1}, self.game._get_oppositecolor_neighbors(black_move1))
 
+    def test_you_can_make_a_move_at_0_0(self):
+        p = Position(0, 0)
+        self.game.make_move(p)
+        self.assertFalse(self.game.goban.is_empty(p))
+
     def test_get_all_OPPOSITE_color_neighbors_directly_adjacent_to_a_given_stone(self):
           # [[BLACK, WHITE, None],
           #  [WHITE, BLACK, None],
           #  [None, None, None]]
+
         black_move1 = Position(0, 0)
         white_move1 = Position(0, 1)
         black_move2 = Position(1, 1)
@@ -61,6 +67,7 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.game.make_move(white_move1)
         self.game.make_move(black_move2)
         self.game.make_move(white_move2)
+        self.game.make_move(black_move1)
 
         self.assertEqual({black_move1, black_move2}, self.game._get_oppositecolor_neighbors(white_move2))
         self.assertEqual({white_move1, white_move2}, self.game._get_oppositecolor_neighbors(black_move1))
@@ -143,33 +150,33 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.assertTrue({white_move4, white_move3} in self.game._get_adjacent_opponent_groups(black_move1))
 
 
+    def test_stone_is_captured_when_it_has_no_liberties_left(self):
+        #     [[None, BLACK, None, ...],
+        #      [BLACK, WHITE, None, ...],
+        #      [None, BLACK, None], ...,
+        #       ....]
+        black_move1 = Position(0, 1)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(2, 1)
+        black_move4 = Position(1, 2)
 
-    # def test_stone_is_captured_when_it_has_no_liberties_left(self):
-    #     #     [[None, BLACK, None, ...],
-    #     #      [BLACK, WHITE, None, ...],
-    #     #      [None, BLACK, None], ...,
-    #     #       ....]
-    #     game = GoGame()
-    #     black_move1 = Position(0, 1)
-    #     black_move2 = Position(1, 0)
-    #     black_move3 = Position(2, 1)
-    #     black_move4 = Position(1, 2)
+        white_move1 = Position(1, 1)
 
-    #     white_move1 = Position(1, 1)
-    #     white_move2 = Position(10, 10)
-    #     white_move3 = Position(11, 11)
+        #not important
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
 
-    #     game.make_move(black_move1)
-    #     game.make_move(black_move2)
-    #     game.make_move(white_move1)
-    #     game.make_move(white_move2)
-    #     game.make_move(black_move3)
-    #     game.make_move(white_move3)
-    #     game.make_move(black_move4)
+        self.game.make_move(black_move1)
+        self.game.make_move(white_move1)
+        self.game.make_move(black_move2)
+        self.game.make_move(white_move2)
+        self.game.make_move(black_move3)
+        self.game.make_move(white_move3)
+        self.game.make_move(black_move4)
 
-    #     self.assertFalse(game._has_at_least_one_liberty(white_move1))
-    #     self.assertEqual(BLACK, game.goban.at(black_move4))
-    #     self.assertTrue(game.goban.is_empty(white_move1))
+        self.assertFalse(self.game._has_at_least_one_liberty(white_move1))
+        self.assertEqual(BLACK, self.game.goban.at(black_move4))
+        self.assertTrue(self.game.goban.is_empty(white_move1))
 
     # def test_stone_is_NOT_captured_when_adjacent_to_samecolor_stones_that_have_liberties_left(self):
     #     #     [[None, BLACK, None, None ...],

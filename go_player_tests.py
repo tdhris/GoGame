@@ -60,6 +60,19 @@ class GoPlayerTests(unittest.TestCase):
         self.player.capture_stones(*stones)
         self.assertEqual(n, self.player.captured_stones)
 
+    def test_correctly_returns_last_move_when_it_is_the_only_move(self):
+        stone = Position(0, 0)
+        self.player.make_move(stone)
+        self.assertEqual(stone, self.player.last_move())
+
+    def test_correctlt_returns_last_move_when_there_are_several(self):
+        n = 10
+        for i in range(n):
+            stone = Position(i, i)
+            self.player.make_move(stone)
+        last = Position(n - 1, n - 1)
+        self.assertEqual(last, self.player.last_move())
+
 
 if __name__ == '__main__':
     unittest.main()

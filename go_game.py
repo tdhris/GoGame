@@ -33,7 +33,7 @@ class GoGame(BoardGame):
         if self.running and self.is_move_valid(move):
             self.board.place(move, self.current_player.symbol)
             self.current_player.make_move(move)
-            # self._check_game_state()
+            self._check_game_state()
             self._change_turn()
 
     def _change_turn(self):
@@ -117,7 +117,7 @@ class GoGame(BoardGame):
             upper = Position(stone.x - 1, stone.y)
             neighbors.add(upper)
 
-        if stone.x < self.goban.size:
+        if stone.x < self.goban.size - 1:
             lower = Position(stone.x + 1, stone.y)
             neighbors.add(lower)
 
@@ -125,7 +125,7 @@ class GoGame(BoardGame):
             left = Position(stone.x, stone.y - 1)
             neighbors.add(left)
 
-        if stone.y < self.goban.size:
+        if stone.y < self.goban.size - 1:
             right = Position(stone.x, stone.y + 1)
             neighbors.add(right)
         return neighbors
