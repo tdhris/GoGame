@@ -2,16 +2,30 @@ from board_game import BoardGame
 from position import Position
 from go_player import GoPlayer
 
+"""
+Inherited from BoardGame (& relevant):
+* properties:
+    - board
+    - running
+    - current_player
+    -has_winner
+
+* methods:
+    - is_move_valid
+    - end_game
+    - _check_board_full(self):
+"""
+
 
 class GoGame(BoardGame):
     BLACK = "B"
     WHITE = "W"
+    players = [GoPlayer(BLACK), GoPlayer(WHITE)]
     DEFAULT_KOMI = 6.5
     DEFAULT_GOBAN_SIZE = 19
 
     def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI):
-        players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
-        super(GoGame, self).__init__(players, size)
+        super(GoGame, self).__init__(self.players, size)
         self._komi = komi
 
     @property

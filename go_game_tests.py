@@ -249,6 +249,8 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.assertEqual(BLACK, self.game.goban.at(black_capturing_move))
         self.assertTrue(self.game.goban.is_empty(white_move1))
         self.assertTrue(self.game.goban.is_empty(white_move2))
+        self.assertEqual(self.game.opponent.captured_stones_count, 2)
+        self.assertEqual({white_move1, white_move2}, self.game.opponent.captured_stones)
 
     def tearDown(self):
         self.game.goban.clear_board()

@@ -46,19 +46,20 @@ class GoPlayerTests(unittest.TestCase):
         self.player = GoPlayer("B")
 
     def test_player_captures_a_stone(self):
-        self.assertEqual(0, self.player.captured_stones)
+        self.assertEqual(0, self.player.captured_stones_count)
         stone = Position(1, 1)
         self.player.capture_stones(stone)
-        self.assertEqual(1, self.player.captured_stones)
+        self.assertEqual(1, self.player.captured_stones_count)
 
     def test_player_captures_multiple_stones(self):
-        stones = []
+        stones = set()
         n = 10
         for i in range(n):
             stone = Position(i, i)
-            stones.append(stone)
+            stones.add(stone)
         self.player.capture_stones(*stones)
-        self.assertEqual(n, self.player.captured_stones)
+        self.assertEqual(n, self.player.captured_stones_count)
+        self.assertEqual(stones, self.player.captured_stones)
 
     def test_correctly_returns_last_move_when_it_is_the_only_move(self):
         stone = Position(0, 0)
