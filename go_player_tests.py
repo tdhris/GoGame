@@ -74,6 +74,21 @@ class GoPlayerTests(unittest.TestCase):
         last = Position(n - 1, n - 1)
         self.assertEqual(last, self.player.last_move())
 
+    def test_two_passes_in_sucession_marked_correctly_when_truly_in_succession(self):
+        self.player.pass_move()
+        self.assertFalse(self.player.two_passes_in_succession())
+        self.player.pass_move()
+        self.assertTrue(self.player.two_passes_in_succession())
+
+    def test_two_passes_in_succession_is_FALSE_when_there_are_other_moves_in_between_passes(self):
+        self.player.pass_move()
+        self.assertFalse(self.player.two_passes_in_succession())
+        p = Position(0, 0)
+        self.player.make_move(p)
+        self.assertFalse(self.player.two_passes_in_succession())
+        self.player.pass_move()
+        self.assertFalse(self.player.two_passes_in_succession())
+
 
 if __name__ == '__main__':
     unittest.main()

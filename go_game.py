@@ -20,13 +20,15 @@ Inherited from BoardGame (& relevant):
 class GoGame(BoardGame):
     BLACK = "B"
     WHITE = "W"
-    players = [GoPlayer(BLACK), GoPlayer(WHITE)]
     DEFAULT_KOMI = 6.5
     DEFAULT_GOBAN_SIZE = 19
+    MAX_PASSES_IN_SUCCESSION = 2
 
     def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI):
-        super(GoGame, self).__init__(self.players, size)
+        players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
+        super(GoGame, self).__init__(players, size)
         self._komi = komi
+        self._passes_in_succession = 0
 
     @property
     def goban(self):
@@ -45,10 +47,26 @@ class GoGame(BoardGame):
 
     def make_move(self, move):
         if self.running and self.is_move_valid(move):
+            self._passes_in_succession = 0
             self.board.place(move, self.current_player.symbol)
             self.current_player.make_move(move)
             self._check_game_state()
             self._change_turn()
+
+    def pass_move(self):
+        self.current_player.pass_move()
+        self._passes_in_succession += 1
+        if self.current_player.two_passes_in_succession():
+            self.resign()
+        elif self._passes_in_succession == self.MAX_PASSES_IN_SUCCESSION:
+            self.end_game()
+        else:
+            self._change_turn()
+
+    def resign(self):
+        self.winner = self.opponent
+        self._has_winner = True
+        self.end_game()
 
     def _change_turn(self):
         self._current_player = self.opponent

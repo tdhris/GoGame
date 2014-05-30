@@ -40,6 +40,52 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
             p = Position(i, i)
             g.make_move(p)
 
+    def test_game_changes_turn_when_player_passes(self):
+        self.assertEqual(BLACK, self.game.current_player.symbol)
+        self.game.pass_move()
+        self.assertEqual(WHITE, self.game.current_player.symbol)
+
+    def test_game_stops_when_player_passes_two_successive_times(self):
+        black_move1 = Position(10, 10)
+        black_move2 = Position(11, 11)
+
+        self.assertEqual(BLACK, self.game.current_player.symbol)
+        self.game.make_move(black_move1)
+
+        self.assertEqual(WHITE, self.game.current_player.symbol)
+        self.game.pass_move()
+
+        self.assertEqual(BLACK, self.game.current_player.symbol)
+        self.game.make_move(black_move2)
+
+        self.assertEqual(WHITE, self.game.current_player.symbol)
+        self.game.pass_move()
+
+        self.assertTrue(self.game.players[1].two_passes_in_succession())
+        self.assertFalse(self.game.running)
+
+    def test_game_stops_when_players_pass_in_succession(self):
+        game = GoGame()
+        game.pass_move()
+        game.pass_move()
+        self.assertFalse(game.running)
+
+    def test_game_does_NOT_stop_if_passes_are_not_in_succession(self):
+        game = GoGame()
+        game.pass_move()
+        white_move1 = Position(0, 0)
+        black_move1 = Position(1, 1)
+
+        game.make_move(white_move1)
+        game.make_move(black_move1)
+        game.pass_move()
+        self.assertTrue(game.running)
+
+
+class GoGameCapturingTests(unittest.TestCase):
+    def setUp(self):
+        self.game = GoGame()
+
     def test_get_ONE_opposite_color_neighbor(self):
         black_move1 = Position(0, 0)
         white_move1 = Position(0, 1)
@@ -148,7 +194,6 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
 
         self.assertTrue({white_move1, white_move2} in self.game._get_adjacent_opponent_groups(black_move1))
         self.assertTrue({white_move4, white_move3} in self.game._get_adjacent_opponent_groups(black_move1))
-
 
     def test_stone_is_captured_when_it_has_no_liberties_left(self):
         #     [[None, BLACK, None, ...],
