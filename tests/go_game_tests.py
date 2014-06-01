@@ -1,4 +1,4 @@
-from go_game import GoGame
+import go_game
 from position import Position
 import unittest
 
@@ -9,7 +9,7 @@ WHITE = "W"
 
 class GoGameBasicFunctionalityTests(unittest.TestCase):
     def setUp(self):
-        self.game = GoGame()
+        self.game = go_game.GoGame()
 
     def test_go_game_has_a_goban_of_size_DEFAULT_GOBAN_SIZE(self):
         self.assertEqual(DEFAULT_GOBAN_SIZE, self.game.goban.size)
@@ -18,10 +18,10 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.assertEqual(6.5, self.game.komi)
 
     def test_you_can_create_go_game_with_a_goban_of_size_THIRTEEN_and_NINE(self):
-        go = GoGame(13)
+        go = go_game.GoGame(13)
         self.assertEqual(13, go.goban.size)
 
-        joseki = GoGame(9)
+        joseki = go_game.GoGame(9)
         self.assertEqual(9, joseki.goban.size)
 
     def test_first_current_player_is_BLACK(self):
@@ -31,7 +31,7 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.assertEqual(WHITE, self.game.opponent.symbol)
 
     def test_game_changes_turns_automatically_when_players_make_valid_moves(self):
-        g = GoGame()
+        g = go_game.GoGame()
         for i in range(DEFAULT_GOBAN_SIZE):
             if i % 2 == 0:
                 self.assertEqual(BLACK, g.current_player.symbol)
@@ -65,13 +65,13 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
         self.assertFalse(self.game.running)
 
     def test_game_stops_when_players_pass_in_succession(self):
-        game = GoGame()
+        game = go_game.GoGame()
         game.pass_move()
         game.pass_move()
         self.assertFalse(game.running)
 
     def test_game_does_NOT_stop_if_passes_are_not_in_succession(self):
-        game = GoGame()
+        game = go_game.GoGame()
         game.pass_move()
         white_move1 = Position(0, 0)
         black_move1 = Position(1, 1)
@@ -84,7 +84,7 @@ class GoGameBasicFunctionalityTests(unittest.TestCase):
 
 class GoGameCapturingTests(unittest.TestCase):
     def setUp(self):
-        self.game = GoGame()
+        self.game = go_game.GoGame()
 
     def test_get_ONE_opposite_color_neighbor(self):
         black_move1 = Position(0, 0)
@@ -299,6 +299,109 @@ class GoGameCapturingTests(unittest.TestCase):
 
     def tearDown(self):
         self.game.goban.clear_board()
+
+
+class GoGameTerritoryTests(unittest.TestCase):
+    def setUp(self):
+        self.game = go_game.GoGame()
+
+    def test_get_empty_neighbors_of_stone(self):
+        """
+        [BLACK, None]
+        [None, None]
+        """
+
+        black_move1 = Position(0, 0)
+        self.game.make_move(black_move1)
+        self.assertEqual({Position(0, 1), Position(1, 0)}, self.game._get_empty_neighbors(black_move1))
+
+    def test_get_empty_neighbors_of_whole_group(self):
+        """
+        [None, BLACK, BLACK, None]
+        [None, None, None, None]
+        """
+
+        black_move1 = Position(0, 1)
+        self.game.make_move(black_move1)
+
+        #not important
+        white_move1 = Position(10, 10)
+        self.game.make_move(white_move1)
+
+        black_move2 = Position(0, 2)
+        self.game.make_move(black_move2)
+
+        self.assertEqual({Position(0, 0), Position(1, 1), Position(1, 2), Position(0, 3)},
+                         self.game._get_empty_group_neighbors([black_move1, black_move2]))
+
+    def test_group_is_alive_when_it_has_two_eyes(self):
+        """
+        [BLACK, None, BLACK, None, BLACK]
+        [BLACK, BLACK, BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(1, 1)
+        black_move4 = Position(1, 2)
+        black_move5 = Position(1, 3)
+        black_move6 = Position(1, 4)
+        black_move7 = Position(0, 4)
+        black_move8 = Position(0, 2)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+        white_move5 = Position(13, 13)
+        white_move6 = Position(14, 14)
+        white_move7 = Position(15, 15)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4,
+                 black_move5, white_move5, black_move6, white_move6, black_move7, white_move7, black_move8]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        black_group = self.game._get_group(black_move1)
+        self.assertTrue(self.game._group_alive(black_group))
+
+    def test_a_group_is_not_alive_if_it_has_only_ONE_eye(self):
+        """
+        [BLACK, None, BLACK, BLACK, BLACK]
+        [BLACK, BLACK, BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(1, 1)
+        black_move4 = Position(1, 2)
+        black_move5 = Position(1, 3)
+        black_move6 = Position(1, 4)
+        black_move7 = Position(0, 4)
+        black_move8 = Position(0, 2)
+        black_move9 = Position(0, 3)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+        white_move5 = Position(13, 13)
+        white_move6 = Position(14, 14)
+        white_move7 = Position(15, 15)
+        white_move8 = Position(16, 16)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4,
+                 black_move5, white_move5, black_move6, white_move6, black_move7, white_move7, black_move8, white_move8,
+                 black_move9]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        black_group = self.game._get_group(black_move1)
+        self.assertFalse(self.game._group_alive(black_group))
 
 if __name__ == '__main__':
     unittest.main()

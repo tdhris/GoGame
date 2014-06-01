@@ -130,6 +130,31 @@ class GoGame(BoardGame):
                 samecolor_neighbors.add(neighbor)
         return samecolor_neighbors
 
+    def _get_empty_neighbors(self, stone):
+        return set([neighbor for neighbor in self._get_neighbors(stone) if self.goban.is_empty(neighbor)])
+
+    def _get_empty_group_neighbors(self, group):
+        all_empty_neighbors = set()
+        for stone in group:
+            empty_neighbors = self._get_empty_neighbors(stone)
+            for neighbor in empty_neighbors:
+                all_empty_neighbors.add(neighbor)
+        return all_empty_neighbors
+
+    def _group_alive(self, group):
+        #group is alive if it has two eyes
+        return self._group_has_two_eyes(group)
+
+    def _group_has_two_eyes(self, group):
+        #an eye is an empty space surrounded by stones of one colour
+        eyes = set()
+        empty_neighbors = self._get_empty_group_neighbors(group)
+        for neighbor in empty_neighbors:
+            adjacents = self._get_neighbors(neighbor)
+            if adjacents.issubset(group):
+                eyes.add(neighbor)
+        return len(eyes) == 2
+
     def _group_surrounded(self, group):
         for stone in group:
             if self._has_at_least_one_liberty(stone):

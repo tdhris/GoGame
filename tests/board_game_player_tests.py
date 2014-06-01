@@ -1,4 +1,4 @@
-from board_game_player import BoardGamePlayer
+import board_game_player
 from position import Position
 import unittest
 
@@ -6,7 +6,7 @@ import unittest
 class BoardPlayerTests(unittest.TestCase):
     def setUp(self):
         self.symbol = "X"
-        self.player = BoardGamePlayer(self.symbol)
+        self.player = board_game_player.BoardGamePlayer(self.symbol)
 
     def test_player_symbol_is_the_one_provided(self):
         self.assertEqual(self.symbol, self.player.symbol)

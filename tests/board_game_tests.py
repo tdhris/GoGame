@@ -1,4 +1,4 @@
-from board_game import BoardGame
+import board_game
 from position import Position
 from board_game_player import BoardGamePlayer
 import unittest
@@ -10,7 +10,7 @@ class BoardGameBasicFunctionalityTests(unittest.TestCase):
         o = BoardGamePlayer("O")
         self.players = [x, o]
         self.board_size = len(self.players)
-        self.game = BoardGame(self.players, self.board_size)
+        self.game = board_game.BoardGame(self.players, self.board_size)
 
     def test_board_game_has_a_board_of_a_given_size(self):
         self.assertEqual(self.board_size, self.game.board.size)
@@ -20,14 +20,14 @@ class BoardGameBasicFunctionalityTests(unittest.TestCase):
 
     def test_game_stops_if_board_is_full(self):
         size_of_board_with_one_field = 1
-        game = BoardGame(self.players, size_of_board_with_one_field)
+        game = board_game.BoardGame(self.players, size_of_board_with_one_field)
         p = Position(0, 0)
         game.make_move(p)
         self.assertFalse(game.running)
 
     def test_board_remains_empty_if_move_is_invalid(self):
         size_of_board_with_one_field = 1
-        g = BoardGame(self.players, size_of_board_with_one_field)
+        g = board_game.BoardGame(self.players, size_of_board_with_one_field)
         p = Position(5, 5)
         g.make_move(p)
         self.assertTrue(g.board.is_board_empty())
@@ -49,7 +49,7 @@ class BoardGameBasicFunctionalityTests(unittest.TestCase):
             BoardGamePlayer("O"), BoardGamePlayer("Z")
 
         players = [x, y, o, z]
-        g = BoardGame(players, len(players))
+        g = board_game.BoardGame(players, len(players))
         for i in range(len(players)):
             self.assertEqual(players[i], g.current_player)
             p = Position(i, i)

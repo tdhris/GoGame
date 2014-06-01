@@ -1,4 +1,4 @@
-from go_player import GoPlayer
+import go_player
 from position import Position
 import unittest
 
@@ -6,7 +6,7 @@ import unittest
 class GoPlayerBoardPlayerTests(unittest.TestCase):
     def setUp(self):
         self.black = "B"
-        self.player = GoPlayer(self.black)
+        self.player = go_player.GoPlayer(self.black)
 
     def test_player_symbol_is_the_one_provided(self):
         self.assertEqual(self.black, self.player.symbol)
@@ -43,7 +43,7 @@ class GoPlayerBoardPlayerTests(unittest.TestCase):
 class GoPlayerTests(unittest.TestCase):
     def setUp(self):
         self.black = "B"
-        self.player = GoPlayer("B")
+        self.player = go_player.GoPlayer("B")
 
     def test_player_captures_a_stone(self):
         self.assertEqual(0, self.player.captured_stones_count)
