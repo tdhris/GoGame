@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 from position import Position
 import unittest
 

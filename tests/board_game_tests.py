@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 import board_game
 from position import Position
 from board_game_player import BoardGamePlayer

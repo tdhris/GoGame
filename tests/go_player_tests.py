@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 import go_player
 from position import Position
 import unittest

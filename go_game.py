@@ -75,7 +75,7 @@ class GoGame(BoardGame):
     def _check_game_state(self):
         self._check_board_full()
         self._capture_stones()
-        self._count_territory()
+        # self._count_territory()
 
     def _capture_stones(self):
         new_stone = self.current_player.last_move()
@@ -173,7 +173,7 @@ class GoGame(BoardGame):
         for neighbor in empty_neighbors:
             adjacents = self._get_neighbors(neighbor)
             if adjacents.issubset(group):
-                eyes.add(neighbor)
+                eyes += 1
         return eyes == self.TWO_EYES
 
     def _group_surrounded(self, group):

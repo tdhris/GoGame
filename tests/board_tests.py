@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 import unittest
 import board
 from position import Position
