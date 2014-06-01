@@ -9,6 +9,7 @@ class GoPlayer(BoardGamePlayer):
         self._captured_stones = set()
         self._captured_stones_count = 0
         self._passes_in_succession_count = 0
+        self.territory = 0
 
     @property
     def stones(self):

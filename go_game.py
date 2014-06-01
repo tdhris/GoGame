@@ -23,6 +23,7 @@ class GoGame(BoardGame):
     DEFAULT_KOMI = 6.5
     DEFAULT_GOBAN_SIZE = 19
     MAX_PASSES_IN_SUCCESSION = 2
+    TWO_EYES = 2
 
     def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI):
         players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
@@ -74,6 +75,7 @@ class GoGame(BoardGame):
     def _check_game_state(self):
         self._check_board_full()
         self._capture_stones()
+        self._count_territory()
 
     def _capture_stones(self):
         new_stone = self.current_player.last_move()
@@ -90,6 +92,22 @@ class GoGame(BoardGame):
     def _remove_stone(self, stone):
         self.goban.remove(stone)
         self.current_player.remove_move(stone)
+
+    def _count_territory(self):
+        #counts current player's teritory
+        teritory = 0
+        player_groups = self._get_player_groups()
+        for group in player_groups:
+            teritory += len(self._empty_territory_surrounded(group))
+        self.current_player.teritory = teritory
+
+    def _get_player_groups(self):
+        player_groups = []
+        for stone in self.current_player.stones:
+            stone_group = self._get_group(stone)
+            if stone_group not in player_groups:
+                player_groups.append(stone_group)
+        return player_groups
 
     def _get_adjacent_opponent_groups(self, stone):
         groups = []
@@ -141,19 +159,22 @@ class GoGame(BoardGame):
                 all_empty_neighbors.add(neighbor)
         return all_empty_neighbors
 
+    def _empty_territory_surrounded(self, group):
+        pass
+
     def _group_alive(self, group):
         #group is alive if it has two eyes
         return self._group_has_two_eyes(group)
 
     def _group_has_two_eyes(self, group):
         #an eye is an empty space surrounded by stones of one colour
-        eyes = set()
+        eyes = 0
         empty_neighbors = self._get_empty_group_neighbors(group)
         for neighbor in empty_neighbors:
             adjacents = self._get_neighbors(neighbor)
             if adjacents.issubset(group):
                 eyes.add(neighbor)
-        return len(eyes) == 2
+        return eyes == self.TWO_EYES
 
     def _group_surrounded(self, group):
         for stone in group:

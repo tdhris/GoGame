@@ -403,5 +403,38 @@ class GoGameTerritoryTests(unittest.TestCase):
         black_group = self.game._get_group(black_move1)
         self.assertFalse(self.game._group_alive(black_group))
 
+    def test_count_teritory_of_two_eyes(self):
+        """
+        [BLACK, None, BLACK, None, BLACK]
+        [BLACK, BLACK, BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(1, 1)
+        black_move4 = Position(1, 2)
+        black_move5 = Position(1, 3)
+        black_move6 = Position(1, 4)
+        black_move7 = Position(0, 4)
+        black_move8 = Position(0, 2)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+        white_move5 = Position(13, 13)
+        white_move6 = Position(14, 14)
+        white_move7 = Position(15, 15)
+        white_move8 = Position(16, 16)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4,
+                 black_move5, white_move5, black_move6, white_move6, black_move7, white_move7, black_move8, white_move8]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        self.assertEqual(2, self.game.current_player.teritory)
+
 if __name__ == '__main__':
     unittest.main()
