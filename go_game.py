@@ -173,11 +173,11 @@ class GoGame(BoardGame):
             return False
 
         surrounded = True
-        player_symbol = self.goban.at(next(iter(player_group)))
+        player_stone = next(iter(player_group))
         for field in territory:
             adjacent_fields = self._get_neighbors(field)
             for adjacent in adjacent_fields:
-                if (not self.goban.is_empty(adjacent)) and self.goban.at(adjacent) != player_symbol:
+                if self._oppositecolor_stone(adjacent, player_stone):
                     surrounded = False
         return surrounded
 
