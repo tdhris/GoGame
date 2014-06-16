@@ -1,8 +1,13 @@
 import os
+from platform import python_version
 from subprocess import call
 
-WORKINGDIR = os.getcwd();
+WORKINGDIR = os.getcwd()
 for file in os.listdir(WORKINGDIR):
     if file.endswith("_tests.py"):
         print("\nExecuting : " + file)
-        call("python " + file, shell=True)
+        if python_version().startswith('3.'):
+            command = "python3"
+        elif python_version().startswith('2.'):
+            command = "python"
+        call(command + " " + file, shell=True)
