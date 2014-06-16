@@ -119,6 +119,32 @@ class BoardGameCountingTests(unittest.TestCase):
                 b.place(p, "X")
         self.assertEqual(size ** 2, b.count_taken_fields())
 
+    def test_get_empty_fields_when_all_fields_are_empty(self):
+        size = 3
+        b = board.Board(size)
+        self.assertEqual(size ** 2, len(b.empty_fields()))
+
+    def test_get_empty_fields_when_there_are_no_empty_fields(self):
+        size = 3
+        b = board.Board(size)
+        for i in range(size):
+            for j in range(size):
+                p = Position(i, j)
+                b.place(p, "X")
+        self.assertEqual([], b.empty_fields())
+
+    def test_get_empty_fields(self):
+        size = 3
+        b = board.Board(size)
+        moves = []
+        for i in range(size):
+            p = Position(i, i)
+            moves.append(p)
+            b.place(p, "X")
+
+        for move in moves:
+            self.assertTrue(move not in b.empty_fields())
+
 
 if __name__ == '__main__':
     unittest.main()

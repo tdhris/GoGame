@@ -1,3 +1,5 @@
+from position import Position
+
 class Board:
     EMPTY_FIELD = None
     DEFAULT_BOARD_SIZE = 3
@@ -25,18 +27,13 @@ class Board:
         return self._board[position.x][position.y] == self.EMPTY_FIELD
 
     def is_board_full(self):
-        for row in self._board:
-            for element in row:
-                if element is self.EMPTY_FIELD:
-                    return False
-        return True
+        return self.count_taken_fields() == self.size ** 2
 
     def is_board_empty(self):
-        for row in self._board:
-            for element in row:
-                if element is not self.EMPTY_FIELD:
-                    return False
-        return True
+        return self.count_taken_fields() == 0
+
+    def count_empty_fields(self):
+        return (self.size ** 2) - self.count_taken_fields()
 
     def count_taken_fields(self):
         count = 0
@@ -46,8 +43,14 @@ class Board:
                     count += 1
         return count
 
-    def count_empty_fields(self):
-        return (self.size ** 2) - self.count_taken_fields()
+    def empty_fields(self):
+        empty_fields = []
+        for row in range(self.size):
+            for col in range(self.size):
+                position = Position(row, col)
+                if self.is_empty(position):
+                    empty_fields.append(position)
+        return empty_fields
 
     def clear_board(self):
         self._board = self._generate_empty_board()

@@ -26,8 +26,8 @@ class GoGame(BoardGame):
     TWO_EYES = 2
 
     def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI):
-        players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
-        super(GoGame, self).__init__(players, size)
+        self._players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
+        super(GoGame, self).__init__(self._players, size)
         self._komi = komi
         self._passes_in_succession = 0
 
@@ -67,7 +67,11 @@ class GoGame(BoardGame):
     def resign(self):
         self.winner = self.opponent
         self._has_winner = True
-        self.end_game()
+        self._end_game()
+
+    def _end_game(self):
+        self._count_territory()
+        self._running = False
 
     def _change_turn(self):
         self._current_player = self.opponent
@@ -75,7 +79,6 @@ class GoGame(BoardGame):
     def _check_game_state(self):
         self._check_board_full()
         self._capture_stones()
-        # self._count_territory()
 
     def _capture_stones(self):
         new_stone = self.current_player.last_move()
@@ -94,16 +97,32 @@ class GoGame(BoardGame):
         self.current_player.remove_move(stone)
 
     def _count_territory(self):
-        #counts current player's teritory
-        teritory = 0
-        player_groups = self._get_player_groups()
-        for group in player_groups:
-            teritory += len(self._empty_territory_surrounded(group))
-        self.current_player.teritory = teritory
+        for player in self._players:
+            teritory = 0
+            player_groups = self._get_player_groups(player)
+            for group in player_groups:
+                teritory += self._count_territory_surrounded(group)
+            player.territory = teritory
 
-    def _get_player_groups(self):
+    def _count_territory_surrounded(self, group):
+        territory = 0
+        common_empty_neighbors = self._get_common_empty_neighbors(group)
+        processed = []
+        for common_empty_neighbor in common_empty_neighbors:
+            if common_empty_neighbor not in processed:
+                processed.append(common_empty_neighbor)
+                empty_neighbor_group = self._get_group(common_empty_neighbor)
+                for empty_neighbor in empty_neighbor_group:
+                    processed.append(empty_neighbor)
+                if self._territory_surrounded(empty_neighbor_group, group):
+                    territory += len(empty_neighbor_group)
+        return territory
+
+    def _get_player_groups(self, player=None):
+        if player is None:
+            player = self.current_player
         player_groups = []
-        for stone in self.current_player.stones:
+        for stone in player.stones:
             stone_group = self._get_group(stone)
             if stone_group not in player_groups:
                 player_groups.append(stone_group)
@@ -119,6 +138,14 @@ class GoGame(BoardGame):
                     groups.append(group)
         return groups
 
+    def _get_empty_neighbors_of_group(self, group):
+        all_empty_neighbors = set()
+        for stone in group:
+            empty_neighbors = self._get_empty_neighbors(stone)
+            for neighbor in empty_neighbors:
+                all_empty_neighbors.add(neighbor)
+        return all_empty_neighbors
+
     def _get_group(self, origin):
         group = set([origin])
         neighbors_to_add = self._get_samecolor_neighbors(origin)
@@ -133,34 +160,38 @@ class GoGame(BoardGame):
         return group
 
     def _get_oppositecolor_neighbors(self, stone):
-        oppositecolor_neighbors = set()
-        all_neighbors = self._get_neighbors(stone)
-        for neighbor in all_neighbors:
-            if not self.goban.is_empty(neighbor) and self.goban.at(neighbor) != self.goban.at(stone):
-                oppositecolor_neighbors.add(neighbor)
-        return oppositecolor_neighbors
+        return set([neighbor for neighbor in self._get_neighbors(stone) if self._oppositecolor_stone(neighbor, stone)])
 
     def _get_samecolor_neighbors(self, stone):
-        samecolor_neighbors = set()
-        all_neighbors = self._get_neighbors(stone)
-        for neighbor in all_neighbors:
-            if not self.goban.is_empty(neighbor) and self.goban.at(neighbor) == self.goban.at(stone):
-                samecolor_neighbors.add(neighbor)
-        return samecolor_neighbors
+        return set([neighbor for neighbor in self._get_neighbors(stone) if self._samecolor_stone(neighbor, stone)])
 
     def _get_empty_neighbors(self, stone):
         return set([neighbor for neighbor in self._get_neighbors(stone) if self.goban.is_empty(neighbor)])
 
-    def _get_empty_group_neighbors(self, group):
-        all_empty_neighbors = set()
-        for stone in group:
-            empty_neighbors = self._get_empty_neighbors(stone)
-            for neighbor in empty_neighbors:
-                all_empty_neighbors.add(neighbor)
-        return all_empty_neighbors
+    def _territory_surrounded(self, territory, player_group):
+        if self._get_empty_neighbors_of_group(player_group).issubset(territory):
+            return False
 
-    def _empty_territory_surrounded(self, group):
-        pass
+        surrounded = True
+        player_symbol = self.goban.at(next(iter(player_group)))
+        for field in territory:
+            adjacent_fields = self._get_neighbors(field)
+            for adjacent in adjacent_fields:
+                if (not self.goban.is_empty(adjacent)) and self.goban.at(adjacent) != player_symbol:
+                    surrounded = False
+        return surrounded
+
+    def _get_common_empty_neighbors(self, group):
+        common_empty_neighbors = set()
+        for empty_neighbor in self._get_empty_neighbors_of_group(group):
+            adjacents_to_neighbor = self._get_neighbors(empty_neighbor)
+            neighboring_stones_in_group_count = 0
+            for adjacent in adjacents_to_neighbor:
+                if adjacent in group:
+                    neighboring_stones_in_group_count += 1
+            if neighboring_stones_in_group_count > 1:
+                common_empty_neighbors.add(empty_neighbor)
+        return common_empty_neighbors
 
     def _group_alive(self, group):
         #group is alive if it has two eyes
@@ -169,7 +200,7 @@ class GoGame(BoardGame):
     def _group_has_two_eyes(self, group):
         #an eye is an empty space surrounded by stones of one colour
         eyes = 0
-        empty_neighbors = self._get_empty_group_neighbors(group)
+        empty_neighbors = self._get_empty_neighbors_of_group(group)
         for neighbor in empty_neighbors:
             adjacents = self._get_neighbors(neighbor)
             if adjacents.issubset(group):
@@ -207,3 +238,9 @@ class GoGame(BoardGame):
             right = Position(stone.x, stone.y + 1)
             neighbors.add(right)
         return neighbors
+
+    def _samecolor_stone(self, first_stone, second_stone):
+        return self.goban.at(first_stone) == self.goban.at(second_stone)
+
+    def _oppositecolor_stone(self, first_stone, second_stone):
+        return (not self.goban.is_empty(first_stone)) and self.goban.at(first_stone) != self.goban.at(second_stone)

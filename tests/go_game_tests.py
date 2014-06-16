@@ -335,7 +335,7 @@ class GoGameTerritoryTests(unittest.TestCase):
         self.game.make_move(black_move2)
 
         self.assertEqual({Position(0, 0), Position(1, 1), Position(1, 2), Position(0, 3)},
-                         self.game._get_empty_group_neighbors([black_move1, black_move2]))
+                         self.game._get_empty_neighbors_of_group([black_move1, black_move2]))
 
     def test_group_is_alive_when_it_has_two_eyes(self):
         """
@@ -406,7 +406,42 @@ class GoGameTerritoryTests(unittest.TestCase):
         black_group = self.game._get_group(black_move1)
         self.assertFalse(self.game._group_alive(black_group))
 
-    @unittest.skip("Territory counting not yet implemented")
+    def test_get_common_empty_fields(self):
+        """
+        [BLACK, None, BLACK, None, BLACK]
+        [BLACK, BLACK, BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(1, 1)
+        black_move4 = Position(1, 2)
+        black_move5 = Position(1, 3)
+        black_move6 = Position(1, 4)
+        black_move7 = Position(0, 4)
+        black_move8 = Position(0, 2)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+        white_move5 = Position(13, 13)
+        white_move6 = Position(14, 14)
+        white_move7 = Position(15, 15)
+        white_move8 = Position(16, 16)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4,
+                 black_move5, white_move5, black_move6, white_move6, black_move7, white_move7, black_move8, white_move8]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        common = self.game._get_common_empty_neighbors([black_move1, black_move2, black_move3, black_move4,
+        black_move5, black_move6, black_move7, black_move8])
+        self.assertEqual(set([Position(0, 1), Position(0, 3)]), common)
+
+
     def test_count_teritory_of_two_eyes(self):
         """
         [BLACK, None, BLACK, None, BLACK]
@@ -438,7 +473,76 @@ class GoGameTerritoryTests(unittest.TestCase):
         for move in moves:
             self.game.make_move(move)
 
-        self.assertEqual(2, self.game.current_player.teritory)
+        self.game._end_game()
+        self.assertEqual(2, self.game.current_player.territory)
+        self.assertEqual(0, self.game.opponent.territory)
+
+    def test_count_teritory_when_no_territory(self):
+        """
+        [BLACK, None, None]
+        [BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(1, 1)
+        black_move4 = Position(1, 2)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        self.game._end_game()
+        self.assertEqual(0, self.game.current_player.territory)
+
+
+    def test_count_teritory_when_territory_is_big(self):
+        """
+        [BLACK, None, None, BLACK]
+        [BLACK, None, None, BLACK]
+        [BLACK, None, None, BLACK]
+        [BLACK, BLACK, BLACK, BLACK]
+        """
+
+        black_move1 = Position(0, 0)
+        black_move2 = Position(1, 0)
+        black_move3 = Position(2, 0)
+        black_move4 = Position(3, 0)
+        black_move5 = Position(3, 1)
+        black_move6 = Position(3, 2)
+        black_move7 = Position(3, 3)
+        black_move8 = Position(2, 3)
+        black_move9 = Position(1, 3)
+        black_move10 = Position(0, 3)
+
+        #not important
+        white_move1 = Position(9, 9)
+        white_move2 = Position(10, 10)
+        white_move3 = Position(11, 11)
+        white_move4 = Position(12, 12)
+        white_move5 = Position(13, 13)
+        white_move6 = Position(14, 14)
+        white_move7 = Position(15, 15)
+        white_move8 = Position(16, 16)
+        white_move9 = Position(17, 17)
+        white_move10 = Position(8, 8)
+
+        moves = [black_move1, white_move1, black_move2, white_move2, black_move3, white_move3, black_move4, white_move4,
+                 black_move5, white_move5, black_move6, white_move6, black_move7, white_move7, black_move8, white_move8,
+                 black_move9, white_move9, black_move10, white_move10]
+
+        for move in moves:
+            self.game.make_move(move)
+
+        self.game._end_game()
+        self.assertEqual(6, self.game.current_player.territory)
 
 if __name__ == '__main__':
     unittest.main()
