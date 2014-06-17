@@ -47,7 +47,7 @@ class GoGame(BoardGame):
             return self.players[0]
 
     def make_move(self, move):
-        if self.running and self.is_move_valid(move):
+        if self.running and self.is_move_valid(move) and self.board.is_empty(move):
             self._passes_in_succession = 0
             self.board.place(move, self.current_player.symbol)
             self.current_player.make_move(move)
