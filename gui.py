@@ -5,8 +5,8 @@ from position import Position
 
 
 BOARD_PIECE = pygame.image.load("./img/board_piece.png")
-BLACK_PIECE = pygame.image.load("./img/black_piece.gif")
-WHITE_PIECE = pygame.image.load("./img/white_piece.gif")
+BLACK_PIECE = pygame.image.load("./img/black_piece.png")
+WHITE_PIECE = pygame.image.load("./img/white_piece.png")
 
 BOARD_SIZE = 19
 SQUARE_SIZE = BOARD_PIECE.get_width()
