@@ -17,18 +17,14 @@ game = GoGame(BOARD_SIZE)
 screen = pygame.display.set_mode([BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE])
 
 def get_inner_rectangle(row, col):
-    x_coord, y_coord, width, height = get_rectangle(row, col)
-    padding = (SQUARE_SIZE - PIECE_SIZE) // 2
-    x_coord += padding
-    y_coord += padding
-    width = SQUARE_SIZE - padding
-    height = SQUARE_SIZE - padding
-    return [x_coord, y_coord, width, height]
+    x_coord = row * SQUARE_SIZE + (SQUARE_SIZE - PIECE_SIZE) // 2
+    y_coord = col * SQUARE_SIZE + (SQUARE_SIZE - PIECE_SIZE) // 2
+    return pygame.Rect(x_coord, y_coord, PIECE_SIZE, PIECE_SIZE)
 
 def get_rectangle(row, col):
     row *= SQUARE_SIZE
     col *= SQUARE_SIZE
-    return [row, col, SQUARE_SIZE, SQUARE_SIZE]
+    return pygame.Rect(row, col, SQUARE_SIZE, SQUARE_SIZE)
 
 def draw_piece(row, col, piece):
     rectangle = get_inner_rectangle(row, col)
@@ -38,8 +34,10 @@ def draw_player_pieces(board):
     for i in range(board.size):
         for j in range(board.size):
             position = Position(i, j)
+            
             if game.goban.at(position) == game.BLACK:
                 draw_piece(i, j, BLACK_PIECE)
+            
             elif game.goban.at(position) == game.WHITE:
                 draw_piece(i, j, WHITE_PIECE)
 
@@ -49,23 +47,18 @@ def draw_squares(board):
             rectangle = get_rectangle(i, j)
             screen.blit(BOARD_PIECE, rectangle)
 
-def draw_surface(board):
-    screen.blit(GOBAN, [0, 0, BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE])
-
 def draw_board(board):
     draw_squares(board)
     draw_player_pieces(board)
     pygame.display.flip()
 
 def within(point, rectangle):
-    x, y = point
-    l, t, w, h = rectangle
-
-    return l <= x <= l + w and t <= y <= t + h
+    rect = pygame.Rect(rectangle)
+    return rect.collidepoint(point)
  
-def square_for(position):
-    for i in range(BOARD_SIZE):
-        for j in range(BOARD_SIZE):
+def get_move(board, position):
+    for i in range(board.size):
+        for j in range(board.size):
             rectangle = get_inner_rectangle(i, j)
             if within(position, rectangle):
                 return Position(i, j)
@@ -77,8 +70,7 @@ while True:
         
         elif event.type == pygame.MOUSEBUTTONUP:
             position = pygame.mouse.get_pos()
-            square = square_for(position)
-            if square is not None:
-                game.make_move(square)
+            move = get_move(game.goban, position)
+            game.make_move(move)
     
     draw_board(game.goban)

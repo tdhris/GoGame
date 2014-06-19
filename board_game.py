@@ -44,7 +44,7 @@ class BoardGame:
             self._change_turn()
 
     def is_move_valid(self, move):
-        return self.board.is_iniside_board(move)
+        return move is not None and self.board.is_iniside_board(move)
 
     def win_game(self):
         self._has_winner = True
