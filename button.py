@@ -24,6 +24,9 @@ class Button(pygame.sprite.Sprite):
         else:
             return self.default_color
 
+    def set_function(self, function):
+        self.function = function
+
     def draw(self, screen, mouse):
         self.check_hover(mouse)
         self.surface.fill(self.color)

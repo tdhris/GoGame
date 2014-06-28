@@ -39,22 +39,55 @@ class GUI:
 
     def create_buttons(self):
         self.buttons = []
+        resign_button = self.create_resign_button()
+        self.buttons.append(resign_button)
 
+        new_game_button = self.create_new_game_button()
+        self.buttons.append(new_game_button)
+
+        pass_button = self.create_pass_button()
+        self.buttons.append(pass_button)
+
+    def create_resign_button(self):
         resign_label = "Resign"
         resign_width, resign_height = self.font.size(resign_label)
         surrounding = 10
         resign_button = Button(resign_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                resign_width + surrounding, resign_height + surrounding,
                                (self.sidemenu.centerx - (resign_width//2), 370), self.game.resign)
-        self.buttons.append(resign_button)
+        return resign_button
 
-
+    def create_new_game_button(self):
         new_game_label = "New Game"
+        surrounding = 10
         new_game_width, new_game_height = self.font.size(new_game_label)
         new_game_button = Button(new_game_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                new_game_width + surrounding, new_game_height + surrounding,
                                (self.sidemenu.centerx - (new_game_width//2), 330), self.new_game)
-        self.buttons.append(new_game_button)
+        return new_game_button
+
+    def create_pass_button(self):
+        pass_label = "Pass"
+        surrounding = 10
+        pass_width, pass_height = self.font.size(pass_label)
+        pass_button = Button(pass_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
+                               pass_width + surrounding, pass_height + surrounding,
+                               (self.sidemenu.centerx - (pass_width//2), 410), self.game.pass_move)
+        return pass_button
+
+
+    def update_buttons(self):
+        for button in self.buttons:
+            if button.label == "Resign":
+                self.buttons.remove(button)
+
+            elif button.label ==  "Pass":
+                self.buttons.remove(button)
+
+        new_resign_button = self.create_resign_button()
+        new_pass_button = self.create_pass_button()
+        self.buttons.append(new_resign_button)
+        self.buttons.append(new_pass_button)
 
 
     def get_inner_rectangle(self, position):
@@ -111,11 +144,11 @@ class GUI:
         self.screen.fill((0, 0, 0))
 
     def show_score(self):
-        self.draw_text("Black's Captured Stones:", 150)
-        self.draw_text(str(self.game.black_player.captured_stones_count), 170)
+        self.draw_text("Black's Score:", 150)
+        self.draw_text(str(self.game.black_player.score), 170)
 
-        self.draw_text("White's Captured Stones:", 250)
-        self.draw_text(str(self.game.white_player.captured_stones_count), 270)
+        self.draw_text("White's Score:", 200)
+        self.draw_text(str(self.game.white_player.score), 220)
 
     def draw_text(self, text, coord_y):
         rendered_text = self.font.render(text, True, self.WHITE)
@@ -154,17 +187,22 @@ class GUI:
         return move is not None
 
     def show_winner(self):
-        self.draw_text("Winner:", 430)
+        self.draw_text("Winner:", 500)
+
         if self.game.winner == self.game.black_player:
             winner = "Black"
-        else:
+        elif self.game.winner == self.game.white_player:
             winner = "White"
+        else:
+            winner = "TIE"
 
-        self.draw_text(winner, 450)
+        self.draw_text(winner, 520)
+
 
     def new_game(self, goban_size=19, komi=6.5):
         self.game = GoGame(goban_size, komi)
-        self.create_buttons()
+        self.update_buttons()
+        
 
     def handle_events(self):
         for event in pygame.event.get():

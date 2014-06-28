@@ -68,7 +68,7 @@ class GoGame(BoardGame):
         if self.current_player.two_passes_in_succession():
             self.resign()
         elif self._passes_in_succession == self.MAX_PASSES_IN_SUCCESSION:
-            self.end_game()
+            self._end_game()
         else:
             self._change_turn()
 
@@ -79,6 +79,13 @@ class GoGame(BoardGame):
 
     def _end_game(self):
         self._count_territory()
+
+        if self.black_player.score < self.white_player.score + self.komi:
+            self.winner = self.black_player
+
+        elif self.black_player.score > self.white_player.score + self.komi:
+            self.winner = self.white_player
+
         self._running = False
 
     def _change_turn(self):
@@ -90,11 +97,16 @@ class GoGame(BoardGame):
 
     def _capture_stones(self):
         new_stone = self.current_player.last_move()
-        groups = self._get_adjacent_opponent_groups(new_stone)
-        for group in groups:
+        opponent_groups = self._get_adjacent_opponent_groups(new_stone)
+        for group in opponent_groups:
             if self._group_surrounded(group):
                 self._remove_group(group)
                 self.current_player.capture_stones(*group)
+
+        group = self._get_group(new_stone)
+        if self._group_surrounded(group):
+            self._remove_group(group)
+            self.opponent.capture_stones(*group)
 
     def _remove_group(self, group):
         for stone in group:

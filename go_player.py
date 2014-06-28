@@ -23,6 +23,11 @@ class GoPlayer(BoardGamePlayer):
     def captured_stones_count(self):
         return self._captured_stones_count
 
+    @property
+    def score(self):
+        return self.captured_stones_count + self.territory
+    
+
     def capture_stones(self, *stones):
         for stone in stones:
             if stone not in self.captured_stones:
