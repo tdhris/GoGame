@@ -25,23 +25,16 @@ class GoGame(BoardGame):
     MAX_PASSES_IN_SUCCESSION = 2
     TWO_EYES = 2
 
-    def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI):
+    def __init__(self, size=DEFAULT_GOBAN_SIZE, komi=DEFAULT_KOMI, handicap=0):
         self._players = [GoPlayer(self.BLACK), GoPlayer(self.WHITE)]
         super(GoGame, self).__init__(self._players, size)
-        self._komi = komi
+        self.komi = komi
         self._passes_in_succession = 0
+        self.handicap = handicap
 
     @property
     def goban(self):
         return self._board
-
-    @property
-    def komi(self):
-        return self._komi
-    @komi.setter
-    def komi(self, value):
-        self._komi = value
-    
 
     @property
     def opponent(self):
