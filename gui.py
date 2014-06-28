@@ -1,5 +1,4 @@
-import pygame
-import sys
+import sys, os, pygame
 from go_game import GoGame
 from position import Position
 
@@ -13,10 +12,12 @@ class GUI:
     BORDER_SIZE = 35
     SIDEMENU_SIZE = 200
     WHITE = (255, 255, 255)
+    GREY = (128, 128, 128)
 
     def __init__(self):
         pygame.init()
         pygame.font.init()
+        pygame.mixer.init()
         self.font = pygame.font.SysFont("arial", 15)
         self.game = GoGame()
         self.board_size = self.game.goban.size
@@ -25,6 +26,7 @@ class GUI:
                                                self.board_size_on_screen])
         pygame.display.set_caption("GoGame")
         self.sidemenu = pygame.Surface((self.SIDEMENU_SIZE, self.screen.get_height())).get_rect(center = ((self.board_size_on_screen +  self.SIDEMENU_SIZE//2), self.screen.get_height()//2))
+        self.place_stone_sound = pygame.mixer.Sound(os.path.join('sound','goclick.wav'))
 
         self.BOARD_PIECE.convert()
         self.BLACK_PIECE.convert()
@@ -93,14 +95,14 @@ class GUI:
         upper_right_corner = (self.screen.get_width(), 0)
         lower_left_corner = (0, self.screen.get_height())
         lower_right_corner = (self.screen.get_width(), self.screen.get_height())
-        goban_upper_right_corner = (self.board_size_on_screen - 35, 0)
-        goban_upper_right_corner = (self.board_size_on_screen - 35, self.board_size_on_screen)
+        goban_upper_right_corner = (self.board_size_on_screen, 0)
+        goban_lower_right_corner = (self.board_size_on_screen, self.board_size_on_screen)
 
-        pygame.draw.line(self.screen, self.WHITE, upper_left_corner, upper_right_corner, self.BORDER_SIZE)
-        pygame.draw.line(self.screen, self.WHITE, upper_left_corner, lower_left_corner, self.BORDER_SIZE)
-        pygame.draw.line(self.screen, self.WHITE, lower_right_corner, upper_right_corner, self.BORDER_SIZE)
-        pygame.draw.line(self.screen, self.WHITE, lower_right_corner, lower_left_corner, self.BORDER_SIZE)
-        pygame.draw.line(self.screen, self.WHITE, goban_upper_right_corner, goban_upper_right_corner, self.BORDER_SIZE)
+        pygame.draw.line(self.screen, self.GREY, upper_left_corner, upper_right_corner, self.BORDER_SIZE)
+        pygame.draw.line(self.screen, self.GREY, upper_left_corner, lower_left_corner, self.BORDER_SIZE)
+        pygame.draw.line(self.screen, self.GREY, lower_right_corner, upper_right_corner, self.BORDER_SIZE)
+        pygame.draw.line(self.screen, self.GREY, lower_right_corner, lower_left_corner, self.BORDER_SIZE)
+        pygame.draw.line(self.screen, self.GREY, goban_upper_right_corner, goban_lower_right_corner, self.BORDER_SIZE)
 
     def within(self, point, rectangle):
         rect = pygame.Rect(rectangle)
@@ -128,6 +130,7 @@ class GUI:
                 
                 if self.inside_board(move):
                     self.game.make_move(move)
+                    self.place_stone_sound.play()
 
 
 GUI = GUI()
