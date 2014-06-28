@@ -46,6 +46,14 @@ class GoGame(BoardGame):
         else:
             return self.players[0]
 
+    @property
+    def black_player(self):
+        return self._players[0]
+    
+    @property
+    def white_player(self):
+        return self._players[1]
+
     def make_move(self, move):
         if self.running and self.is_move_valid(move) and self.board.is_empty(move):
             self._passes_in_succession = 0
