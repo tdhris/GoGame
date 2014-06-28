@@ -31,12 +31,13 @@ class GUI:
         self.sidemenu = pygame.Surface((self.SIDEMENU_SIZE, self.screen.get_height())).get_rect(center = ((self.board_size_on_screen +  self.SIDEMENU_SIZE//2),
                                                                                                            self.screen.get_height()//2))
         self.place_stone_sound = pygame.mixer.Sound(os.path.join('sound','goclick.wav'))
-
         self.create_buttons()
 
         self.BOARD_PIECE.convert()
         self.BLACK_PIECE.convert()
         self.WHITE_PIECE.convert()
+
+        self.new_game_sound.play()
 
     def create_buttons(self):
         self.buttons = []
@@ -49,6 +50,12 @@ class GUI:
         pass_button = self.create_pass_button()
         self.buttons.append(pass_button)
 
+        komi_5_button = self.create_komi_5_button()
+        self.buttons.append(komi_5_button)
+
+        komi_6_button = self.create_komi_6_button()
+        self.buttons.append(komi_6_button)
+
     def create_resign_button(self):
         resign_label = "Resign"
         resign_width, resign_height = self.font.size(resign_label)
@@ -56,19 +63,19 @@ class GUI:
         resign_sound = pygame.mixer.Sound(os.path.join('sound','goresign.wav'))
         resign_button = Button(resign_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                resign_width + surrounding, resign_height + surrounding,
-                               (self.sidemenu.centerx - (resign_width//2), 370),
+                               (self.sidemenu.centerx - (resign_width//2), 310),
                                 self.game.resign, resign_sound)
         return resign_button
 
     def create_new_game_button(self):
         new_game_label = "New Game"
         surrounding = 10
-        new_game_sound = pygame.mixer.Sound(os.path.join('sound','gonewgame.wav'))
+        self.new_game_sound = pygame.mixer.Sound(os.path.join('sound','gonewgame.wav'))
         new_game_width, new_game_height = self.font.size(new_game_label)
         new_game_button = Button(new_game_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                new_game_width + surrounding, new_game_height + surrounding,
-                               (self.sidemenu.centerx - (new_game_width//2), 330),
-                                self.new_game, new_game_sound)
+                               (self.sidemenu.centerx - (new_game_width//2), 270),
+                                self.new_game, self.new_game_sound)
         return new_game_button
 
     def create_pass_button(self):
@@ -78,9 +85,32 @@ class GUI:
         pass_width, pass_height = self.font.size(pass_label)
         pass_button = Button(pass_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                pass_width + surrounding, pass_height + surrounding,
-                               (self.sidemenu.centerx - (pass_width//2), 410),
+                               (self.sidemenu.centerx - (pass_width//2), 350),
                                 self.game.pass_move, pass_sound)
         return pass_button
+
+
+    def create_komi_5_button(self):
+        komi_5_label = "Komi = 5.5"
+        surrounding = 10
+        komi_5_sound = pygame.mixer.Sound(os.path.join('sound','gokomi.wav'))
+        komi_5_width, komi_5_height = self.font.size(komi_5_label)
+        komi_5_button = Button(komi_5_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
+                               komi_5_width + surrounding, komi_5_height + surrounding,
+                               (self.sidemenu.centerx - (komi_5_width//2), 390),
+                                self.change_komi_5, komi_5_sound)
+        return komi_5_button
+
+    def create_komi_6_button(self):
+        komi_6_label = "Komi = 6.5"
+        surrounding = 10
+        komi_6_sound = pygame.mixer.Sound(os.path.join('sound','gokomi.wav'))
+        komi_6_width, komi_6_height = self.font.size(komi_6_label)
+        komi_6_button = Button(komi_6_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
+                               komi_6_width + surrounding, komi_6_height + surrounding,
+                               (self.sidemenu.centerx - (komi_6_width//2), 430),
+                                self.change_komi_6, komi_6_sound)
+        return komi_6_button
 
 
     def update_buttons(self):
@@ -106,14 +136,14 @@ class GUI:
                 position = pygame.mouse.get_pos()
                 move = self.get_move(position)
                 
-                if self.inside_board(move):
+                if self.inside_board(move) and self.game.running:
                     self.game.make_move(move)
                     self.place_stone_sound.play()
 
                 for button in self.buttons:
                     if button.check_hover(position):
                         button.function()
-                        button.sound.play()
+                        button.play_sound()
 
     def within(self, point, rectangle):
         rect = pygame.Rect(rectangle)
@@ -179,7 +209,7 @@ class GUI:
         self.draw_text(str(self.game.black_player.score), 170)
 
         self.draw_text("White's Score:", 200)
-        self.draw_text(str(self.game.white_player.score), 220)
+        self.draw_text(str(self.game.white_player.score + self.game.komi), 220)
 
     def show_komi(self):
         self.draw_text("Komi:", 100)
@@ -219,6 +249,11 @@ class GUI:
 
         self.draw_text(winner, 520)
 
+    def change_komi_5(self):
+        self.game.komi = 5.5
+
+    def change_komi_6(self):
+        self.game.komi = 6.5
 
     def new_game(self, goban_size=19, komi=6.5):
         self.game = GoGame(goban_size, komi)

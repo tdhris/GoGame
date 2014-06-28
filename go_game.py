@@ -38,6 +38,10 @@ class GoGame(BoardGame):
     @property
     def komi(self):
         return self._komi
+    @komi.setter
+    def komi(self, value):
+        self._komi = value
+    
 
     @property
     def opponent(self):
@@ -81,10 +85,10 @@ class GoGame(BoardGame):
         self._count_territory()
 
         if self.black_player.score < self.white_player.score + self.komi:
-            self.winner = self.black_player
+            self.winner = self.white_player
 
         elif self.black_player.score > self.white_player.score + self.komi:
-            self.winner = self.white_player
+            self.winner = self.black_player
 
         self._running = False
 
