@@ -13,7 +13,7 @@ class GUI:
     BORDER_SIZE = 35
     SIDEMENU_SIZE = 200
     WHITE = (255, 255, 255)
-    GREY = (128, 128, 128)
+    GREY = (120, 120, 120)
     LIGHTGREY = (150, 150, 150)
 
 
@@ -28,7 +28,8 @@ class GUI:
         self.screen = pygame.display.set_mode([self.board_size_on_screen + self.SIDEMENU_SIZE,
                                                self.board_size_on_screen])
         pygame.display.set_caption("GoGame")
-        self.sidemenu = pygame.Surface((self.SIDEMENU_SIZE, self.screen.get_height())).get_rect(center = ((self.board_size_on_screen +  self.SIDEMENU_SIZE//2), self.screen.get_height()//2))
+        self.sidemenu = pygame.Surface((self.SIDEMENU_SIZE, self.screen.get_height())).get_rect(center = ((self.board_size_on_screen +  self.SIDEMENU_SIZE//2),
+                                                                                                           self.screen.get_height()//2))
         self.place_stone_sound = pygame.mixer.Sound(os.path.join('sound','goclick.wav'))
 
         self.create_buttons()
@@ -52,27 +53,33 @@ class GUI:
         resign_label = "Resign"
         resign_width, resign_height = self.font.size(resign_label)
         surrounding = 10
+        resign_sound = pygame.mixer.Sound(os.path.join('sound','goresign.wav'))
         resign_button = Button(resign_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                resign_width + surrounding, resign_height + surrounding,
-                               (self.sidemenu.centerx - (resign_width//2), 370), self.game.resign)
+                               (self.sidemenu.centerx - (resign_width//2), 370),
+                                self.game.resign, resign_sound)
         return resign_button
 
     def create_new_game_button(self):
         new_game_label = "New Game"
         surrounding = 10
+        new_game_sound = pygame.mixer.Sound(os.path.join('sound','gonewgame.wav'))
         new_game_width, new_game_height = self.font.size(new_game_label)
         new_game_button = Button(new_game_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                new_game_width + surrounding, new_game_height + surrounding,
-                               (self.sidemenu.centerx - (new_game_width//2), 330), self.new_game)
+                               (self.sidemenu.centerx - (new_game_width//2), 330),
+                                self.new_game, new_game_sound)
         return new_game_button
 
     def create_pass_button(self):
         pass_label = "Pass"
         surrounding = 10
+        pass_sound = pygame.mixer.Sound(os.path.join('sound','gopass.wav'))
         pass_width, pass_height = self.font.size(pass_label)
         pass_button = Button(pass_label, self.font, self.GREY, self.LIGHTGREY, self.WHITE,
                                pass_width + surrounding, pass_height + surrounding,
-                               (self.sidemenu.centerx - (pass_width//2), 410), self.game.pass_move)
+                               (self.sidemenu.centerx - (pass_width//2), 410),
+                                self.game.pass_move, pass_sound)
         return pass_button
 
 
@@ -90,15 +97,57 @@ class GUI:
         self.buttons.append(new_pass_button)
 
 
-    def get_inner_rectangle(self, position):
-        x_coord = position.x * self.SQUARE_SIZE + (self.SQUARE_SIZE - self.PIECE_SIZE) // 2
-        y_coord = position.y * self.SQUARE_SIZE + (self.SQUARE_SIZE - self.PIECE_SIZE) // 2
-        return pygame.Rect(x_coord, y_coord, self.PIECE_SIZE, self.PIECE_SIZE)
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            
+            elif event.type == pygame.MOUSEBUTTONUP:
+                position = pygame.mouse.get_pos()
+                move = self.get_move(position)
+                
+                if self.inside_board(move):
+                    self.game.make_move(move)
+                    self.place_stone_sound.play()
 
-    def get_rectangle(self, position):
-        row = position.x * self.SQUARE_SIZE
-        col = position.y * self.SQUARE_SIZE
-        return pygame.Rect(row, col, self.SQUARE_SIZE, self.SQUARE_SIZE)
+                for button in self.buttons:
+                    if button.check_hover(position):
+                        button.function()
+                        button.sound.play()
+
+    def within(self, point, rectangle):
+        rect = pygame.Rect(rectangle)
+        return rect.collidepoint(point)
+    
+    def get_move(self, position):
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                move = Position(i, j)
+                rectangle = self.get_inner_rectangle(move)
+                if self.within(position, rectangle):
+                    return move
+
+    def inside_board(self, move):
+        return move is not None
+
+    def draw(self):
+        self.clear_screen()
+        self.draw_squares()
+        self.draw_borders()
+        self.draw_player_pieces()
+        self.draw_buttons()
+        self.show_score()
+        self.show_komi()
+
+        if not self.game.running:
+            self.show_winner()
+
+        pygame.display.flip()
+
+    def draw_buttons(self):
+        mouse = pygame.mouse.get_pos()
+        for button in self.buttons:
+            button.draw(self.screen, mouse)
 
     def draw_piece(self, position, piece):
         rectangle = self.get_inner_rectangle(position)
@@ -122,24 +171,6 @@ class GUI:
                 rectangle = self.get_rectangle(position)
                 self.screen.blit(self.BOARD_PIECE, rectangle)
 
-    def draw(self):
-        self.clear_screen()
-        self.draw_squares()
-        self.draw_borders()
-        self.draw_player_pieces()
-        self.draw_buttons()
-        self.show_score()
-
-        if not self.game.running:
-            self.show_winner()
-
-        pygame.display.flip()
-
-    def draw_buttons(self):
-        mouse = pygame.mouse.get_pos()
-        for button in self.buttons:
-            button.draw(self.screen, mouse)
-
     def clear_screen(self):
         self.screen.fill((0, 0, 0))
 
@@ -149,6 +180,10 @@ class GUI:
 
         self.draw_text("White's Score:", 200)
         self.draw_text(str(self.game.white_player.score), 220)
+
+    def show_komi(self):
+        self.draw_text("Komi:", 100)
+        self.draw_text(str(self.game.komi), 120)
 
     def draw_text(self, text, coord_y):
         rendered_text = self.font.render(text, True, self.WHITE)
@@ -171,20 +206,6 @@ class GUI:
         pygame.draw.line(self.screen, self.GREY, lower_right_corner, lower_left_corner, self.BORDER_SIZE)
         pygame.draw.line(self.screen, self.GREY, goban_upper_right_corner, goban_lower_right_corner, self.BORDER_SIZE)
 
-    def within(self, point, rectangle):
-        rect = pygame.Rect(rectangle)
-        return rect.collidepoint(point)
-     
-    def get_move(self, position):
-        for i in range(self.board_size):
-            for j in range(self.board_size):
-                move = Position(i, j)
-                rectangle = self.get_inner_rectangle(move)
-                if self.within(position, rectangle):
-                    return move
-
-    def inside_board(self, move):
-        return move is not None
 
     def show_winner(self):
         self.draw_text("Winner:", 500)
@@ -202,24 +223,17 @@ class GUI:
     def new_game(self, goban_size=19, komi=6.5):
         self.game = GoGame(goban_size, komi)
         self.update_buttons()
-        
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            
-            elif event.type == pygame.MOUSEBUTTONUP:
-                position = pygame.mouse.get_pos()
-                move = self.get_move(position)
-                
-                if self.inside_board(move):
-                    self.game.make_move(move)
-                    self.place_stone_sound.play()
 
-                for button in self.buttons:
-                    if button.check_hover(position):
-                        button.function()
+    def get_inner_rectangle(self, position):
+        x_coord = position.x * self.SQUARE_SIZE + (self.SQUARE_SIZE - self.PIECE_SIZE) // 2
+        y_coord = position.y * self.SQUARE_SIZE + (self.SQUARE_SIZE - self.PIECE_SIZE) // 2
+        return pygame.Rect(x_coord, y_coord, self.PIECE_SIZE, self.PIECE_SIZE)
+
+    def get_rectangle(self, position):
+        row = position.x * self.SQUARE_SIZE
+        col = position.y * self.SQUARE_SIZE
+        return pygame.Rect(row, col, self.SQUARE_SIZE, self.SQUARE_SIZE)
 
 
 GUI = GUI()

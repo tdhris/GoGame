@@ -2,7 +2,7 @@ import pygame
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, label, font, default_color, hover_color, text_color, width, height, coordinates, function):
+    def __init__(self, label, font, default_color, hover_color, text_color, width, height, coordinates, function, sound):
         pygame.sprite.Sprite.__init__(self)
         self.label = label
         self.font = font
@@ -11,6 +11,7 @@ class Button(pygame.sprite.Sprite):
         self.text_color = text_color
         self.coordinates = coordinates
         self.function = function
+        self.sound = sound
         self.is_hover = False
         self.surface = pygame.Surface([width, height])
 
